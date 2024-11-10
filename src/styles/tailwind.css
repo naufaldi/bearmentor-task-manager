@@ -5,4 +5,10 @@
   :root {
     --radius: 0.5rem
   }
+  .display-2xl{
+    @apply text-[72px] leading-[90px] -tracking-[0.02em];
+  }
+  .display-lg{
+    @apply text-[48px] leading-[80px] -tracking-[0.02em];
+  }
 }

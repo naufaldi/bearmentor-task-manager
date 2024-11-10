@@ -6,26 +6,16 @@
 
    - [ ] Create a form component to allow users to add new habits.
    - [ ] Implement state management to handle new habit input.
+   - [] Add Button Submit
    - [ ] Ensure the form clears after submission.
 
-2. **Daily Habit Tracking**
-
-   - [ ] Develop a component to display each habit.
-   - [ ] Add functionality to mark a habit as completed for the day.
-   - [ ] Toggle habit completion status.
-
-3. **Habit List Display**
+2. **Habit List Display**
 
    - [ ] Create a component to list all habits.
    - [ ] Integrate the habit item component to display each habit.
    - [ ] Ensure the list updates dynamically as habits are added or modified.
 
-4. **Streak Tracking**
-
-   - [ ] Implement a feature to track the current streak of consecutive days a habit is completed.
-   - [ ] Display the streak count next to each habit.
-
-5. **Edit and Delete Habits**
+3. **Edit and Delete Habits**
    - [ ] Enable users to edit the name of a habit.
    - [ ] Allow users to delete habits from the list.
    - [ ] Ensure changes persist in the application state.
