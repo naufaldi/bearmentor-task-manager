@@ -15,6 +15,7 @@ interface ItemHabitProps {
   setDate: (date: string) => void;
 }
 
+//  UI Components, Data dari props
 const ItemHabit = ({ nameHabbits, id, variant, checked, onCheckedChange, onEdit, onDelete, date, setDate }: ItemHabitProps) => {
   const progress = variant === 'progress';
   // ini state [get, set]

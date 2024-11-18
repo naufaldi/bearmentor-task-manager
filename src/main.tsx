@@ -16,7 +16,13 @@ function Root() {
     { id: '4', nameHabbits: 'Habit 4', variant: 'planned' },
     { id: '5', nameHabbits: 'Habit 5', variant: 'planned' },
   ]);
-
+  const props = {
+    makan: 'Makan',
+    minum: 'Minum',
+    lari: 'Lari',
+    duduk: 'Duduk',
+    tidur: 'Tidur'
+  }
   return (
     <StrictMode>
       <HabbitContext.Provider value={{
@@ -26,7 +32,7 @@ function Root() {
         <MenuContext.Provider value={{
           menu: 'Menu 1'
         }}>
-          <App />
+          <App props={props} />
         </MenuContext.Provider>
       </HabbitContext.Provider>
     </StrictMode>

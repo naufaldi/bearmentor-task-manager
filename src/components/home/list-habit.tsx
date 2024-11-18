@@ -1,64 +1,132 @@
+"use client"
 
-import { useContext, useState, } from 'react';
-import ItemHabit from './item-habit'
-import { HabbitContext } from '@/main';
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+
+import { Plus } from 'lucide-react'
+import { Habit } from "@/type/habit"
+import FilterComponent from "./habit-filter"
+import HabitChart from "./habit-track"
+import HabitItem from "./habit-item"
+
+// Habit type definition
 
 
-// function, data, handle data, handle event List Habbit
-// itemHabbit hanya mendaptkan data dari listHabbit
+// Main HabitTracker component
+export default function HabitTracker() {
+  const [habits, setHabits] = useState<Habit[]>([])
+  const [filter, setFilter] = useState("all")
 
+  // Load habits from localStorage on component mount
+  useEffect(() => {
+    const savedHabits = localStorage.getItem("habits")
+    if (savedHabits) {
+      setHabits(JSON.parse(savedHabits))
+    }
+  }, [])
 
-export const ListHabbit = () => {
-  const { habitsGlobal, setHabitsGlobal } = useContext(HabbitContext);
+  // Save habits to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("habits", JSON.stringify(habits))
+  }, [habits])
 
-  const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
-  // const [editHabbit, setEditHabbit] = useState<{ [key: string]: string }>({});
-  const handleCheckedChange = (id: string, checked: boolean) => {
-    setCheckedItems(prev => ({
-      ...prev,
-      [id]: checked
-    }));
-  };
-
-  const [date, setDate] = useState<string>('Jumat');
-  const handleEditChange = (id: string) => {
-
-    setHabitsGlobal(prevHabits => prevHabits.map(item =>
-      item.id === id ? { ...item, nameHabbits: 'Habit Baru' } : item
-    ));
-
+  const addHabit = (name: string) => {
+    const newHabit: Habit = {
+      id: Date.now(),
+      name,
+      completed: Array(7).fill(false),
+    }
+    setHabits([...habits, newHabit])
   }
+
+  const toggleHabit = (id: number, day: number) => {
+    setHabits(
+      habits.map((habit) => {
+        if (habit.id === id) {
+          const newCompleted = [...habit.completed]
+          newCompleted[day] = !newCompleted[day]
+          return { ...habit, completed: newCompleted }
+        }
+        return habit
+      })
+    )
+  }
+
+  const editHabit = (id: number, newName: string) => {
+    setHabits(habits.map((habit) => (habit.id === id ? { ...habit, name: newName } : habit)))
+  }
+
+  const deleteHabit = (id: number) => {
+    setHabits(habits.filter((habit) => habit.id !== id))
+  }
+
+  const filteredHabits = habits.filter((habit) => {
+    if (filter === "all") return true
+    if (filter === "completed") return habit.completed[habit.completed.length - 1]
+    if (filter === "incomplete") return !habit.completed[habit.completed.length - 1]
+    return true
+  })
+
   return (
-    <>
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"> List Habbit All</h1>
-      <ul className="flex flex-col gap-4">
-        {
-          habitsGlobal.map((item) => (
-            <ItemHabit
-              date={date}
-              setDate={setDate}
-              key={item.id}
-              nameHabbits={item.nameHabbits}
-              id={item.id}
-              variant={item.variant}
-              checked={checkedItems[item.id] || false}
-              onCheckedChange={(checked) => handleCheckedChange(item.id, checked)}
-              onEdit={() => handleEditChange(item.id)}
-              onDelete={() => { alert(`Delete ${item.nameHabbits}`) }}
-            />
-          ))
-        }
-
-      </ul>
-      {/* <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"> List Habbit Progress</h1>
-      <ul className="flex flex-col gap-4">
-        {
-          listHabbit.filter((item) => item.variant === 'progress').map((item) => (
-            <ItemHabit key={item.id} nameHabbits={item.nameHabbits} id={item.id} variant={item.variant} />
-          ))
-        }
-
-      </ul> */}
-    </>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Habit Tracker</h1>
+      <AddHabitForm onAdd={addHabit} />
+      <FilterComponent filter={filter} setFilter={setFilter} />
+      <HabitList habits={filteredHabits} onToggle={toggleHabit} onEdit={editHabit} onDelete={deleteHabit} />
+      <HabitChart habits={habits} />
+    </div>
   )
 }
+
+// AddHabitForm component
+function AddHabitForm({ onAdd }: { onAdd: (name: string) => void }) {
+  const [name, setName] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (name.trim()) {
+      onAdd(name.trim())
+      setName("")
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
+      <Input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="New habit name"
+        className="flex-grow"
+      />
+      <Button type="submit">
+        <Plus className="mr-2 h-4 w-4" /> Add Habit
+      </Button>
+    </form>
+  )
+}
+
+
+// HabitList component
+function HabitList({
+  habits,
+  onToggle,
+  onEdit,
+  onDelete,
+}: {
+  habits: Habit[]
+  onToggle: (id: number, day: number) => void
+  onEdit: (id: number, newName: string) => void
+  onDelete: (id: number) => void
+}) {
+  return (
+    <div className="space-y-4">
+      {habits.map((habit) => (
+        <HabitItem key={habit.id} habit={habit} onToggle={onToggle} onEdit={onEdit} onDelete={onDelete} />
+      ))}
+    </div>
+  )
+}
+
+
