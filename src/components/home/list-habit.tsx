@@ -9,6 +9,9 @@ import { Habit } from "@/type/habit"
 import FilterComponent from "./habit-filter"
 import HabitChart from "./habit-track"
 import HabitItem from "./habit-item"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 // Habit type definition
 
@@ -27,9 +30,9 @@ export default function HabitTracker() {
   }, [])
 
   // Save habits to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("habits", JSON.stringify(habits))
-  }, [habits])
+  // useEffect(() => {
+  //   localStorage.setItem("habits", JSON.stringify(habits))
+  // }, [habits])
 
   const addHabit = (name: string) => {
     const newHabit: Habit = {
@@ -80,26 +83,43 @@ export default function HabitTracker() {
 }
 
 // AddHabitForm component
-function AddHabitForm({ onAdd }: { onAdd: (name: string) => void }) {
-  const [name, setName] = useState("")
+const habitSchema = z.object({
+  name: z.string()
+    .min(1, "Habit name is required")
+    .max(50, "Habit name must be less than 50 characters")
+    .trim()
+});
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (name.trim()) {
-      onAdd(name.trim())
-      setName("")
-    }
-  }
+type HabitFormData = z.infer<typeof habitSchema>;
+
+function AddHabitForm({ onAdd }: { onAdd: (name: string) => void }) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<HabitFormData>({
+    resolver: zodResolver(habitSchema)
+  });
+
+  const onSubmit = (data: HabitFormData) => {
+    onAdd(data.name);
+    reset();
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 flex gap-2">
-      <Input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="New habit name"
-        className="flex-grow"
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="mb-4 flex gap-2">
+      <div className="flex-grow">
+        <Input
+          {...register("name")}
+          type="text"
+          placeholder="New habit name"
+          className="w-full"
+        />
+        {errors.name && (
+          <span className="text-sm text-red-500">{errors.name.message}</span>
+        )}
+      </div>
       <Button type="submit">
         <Plus className="mr-2 h-4 w-4" /> Add Habit
       </Button>

@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Habit } from "@/type/habit"
-import { Checkbox } from "@radix-ui/react-checkbox"
+
 import { Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 
