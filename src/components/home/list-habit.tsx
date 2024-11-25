@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -93,6 +93,7 @@ const habitSchema = z.object({
 type HabitFormData = z.infer<typeof habitSchema>;
 
 function AddHabitForm({ onAdd }: { onAdd: (name: string) => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const {
     register,
     handleSubmit,
@@ -106,11 +107,17 @@ function AddHabitForm({ onAdd }: { onAdd: (name: string) => void }) {
     onAdd(data.name);
     reset();
   };
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mb-4 flex gap-2">
       <div className="flex-grow">
         <Input
+
           {...register("name")}
           type="text"
           placeholder="New habit name"
